@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caviar Knowledge Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #2A7A5A; --green-dark: #1f5e44; --green-light: #e8f5ef;
+    --bg: #F9F9F7; --bg-card: #FFFFFF; --bg-secondary: #F2F2EF;
+    --ink: #1A1A18; --ink-mid: #4A4A45; --ink-light: #8A8A82;
+    --border: #E2E2DC; --correct: #3B6B3B; --correct-bg: #EFF6EF;
+    --wrong: #8B2E2E; --wrong-bg: #F9EDED;
+  }
+  body { background: var(--bg); color: var(--ink); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 1rem 4rem; }
+  header { width: 100%; max-width: 640px; text-align: center; padding: 2.5rem 0 1.75rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+  header h1 { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 1.85rem; color: var(--ink); letter-spacing: 0.03em; }
+  header p { margin-top: 0.4rem; font-size: 12px; color: var(--ink-light); letter-spacing: 0.1em; text-transform: uppercase; }
+  .container { width: 100%; max-width: 640px; }
+  .filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .filter-btn { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; padding: 5px 13px; border-radius: 4px; border: 1px solid var(--border); background: transparent; color: var(--ink-light); cursor: pointer; transition: all 0.15s; }
+  .filter-btn:hover { border-color: var(--green); color: var(--green); }
+  .filter-btn.active { background: var(--green); border-color: var(--green); color: white; }
+  .progress-wrap { margin-bottom: 1rem; }
+  .progress-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-light); margin-bottom: 6px; }
+  .progress-bar { height: 2px; background: var(--border); border-radius: 1px; }
+  .progress-fill { height: 100%; background: var(--green); border-radius: 1px; transition: width 0.4s ease; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-top: 3px solid var(--green); border-radius: 6px; padding: 2.5rem 2rem; cursor: pointer; min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin-bottom: 1rem; transition: box-shadow 0.15s; }
+  .card:hover { box-shadow: 0 4px 20px rgba(42,122,90,0.1); }
+  .cat-badge { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green-dark); background: var(--green-light); border: 1px solid #b8dece; padding: 3px 10px; border-radius: 4px; margin-bottom: 1.25rem; }
+  .card-q { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 500; line-height: 1.5; color: var(--ink); }
+  .card-hint { margin-top: 1.25rem; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); }
+  .answer-box { background: var(--bg-secondary); border-left: 3px solid var(--green); border-radius: 0 4px 4px 0; padding: 1.25rem 1.5rem; margin-bottom: 1rem; display: none; animation: fadeIn 0.2s ease; }
+  .answer-box.show { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .answer-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green-dark); margin-bottom: 0.5rem; }
+  .answer-text { font-size: 15px; line-height: 1.65; color: var(--ink-mid); }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .btn { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400; padding: 9px 20px; border-radius: 4px; cursor: pointer; transition: all 0.15s; border: 1px solid; }
+  .btn-got { background: var(--correct-bg); border-color: var(--correct); color: var(--correct); }
+  .btn-got:hover { background: var(--correct); color: white; }
+  .btn-miss { background: var(--wrong-bg); border-color: var(--wrong); color: var(--wrong); }
+  .btn-miss:hover { background: var(--wrong); color: white; }
+  .btn-skip { background: transparent; border-color: var(--border); color: var(--ink-light); }
+  .btn-skip:hover { border-color: var(--ink-light); color: var(--ink); }
+  .btn-next { background: var(--green); border-color: var(--green); color: white; }
+  .btn-next:hover { background: var(--green-dark); border-color: var(--green-dark); }
+  .btn-restart { background: transparent; border-color: var(--border); color: var(--ink-mid); }
+  .btn-restart:hover { border-color: var(--green); color: var(--green); }
+  .score-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 1rem; }
+  .score-cell { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 1rem; text-align: center; }
+  .score-num { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; color: var(--ink); }
+  .score-lbl { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-light); margin-top: 2px; }
+  footer { margin-top: 3rem; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-light); text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Caviar Knowledge Quiz</h1>
+  <p>Test your expertise &mdash; 40 cards</p>
+</header>
+<div class="container">
+  <div class="filter-row" id="filters"></div>
+  <div class="progress-wrap">
+    <div class="progress-meta"><span id="counter">Card 1</span><span id="score-inline">Correct: 0 &nbsp;|&nbsp; Missed: 0</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+  </div>
+  <div class="card" onclick="reveal()">
+    <div class="cat-badge" id="cat-badge">Category</div>
+    <div class="card-q" id="qtext"></div>
+    <div class="card-hint" id="hint">Tap to reveal answer</div>
+  </div>
+  <div class="answer-box" id="ans">
+    <div class="answer-label">Answer</div>
+    <div class="answer-text" id="atext"></div>
+  </div>
+  <div class="btn-row" id="grade-row" style="display:none">
+    <button class="btn btn-got" onclick="mark(true)">Got it</button>
+    <button class="btn btn-miss" onclick="mark(false)">Missed it</button>
+    <button class="btn btn-skip" onclick="skip()">Skip</button>
+  </div>
+  <div class="btn-row" id="nav-row" style="display:none">
+    <button class="btn btn-next" onclick="nextCard()">Next card</button>
+    <button class="btn btn-restart" onclick="restart()">Restart deck</button>
+  </div>
+  <div class="score-grid" id="scores" style="display:none">
+    <div class="score-cell"><div class="score-num" id="s-c">0</div><div class="score-lbl">Correct</div></div>
+    <div class="score-cell"><div class="score-num" id="s-w">0</div><div class="score-lbl">Missed</div></div>
+    <div class="score-cell"><div class="score-num" id="s-p">—</div><div class="score-lbl">Score</div></div>
+  </div>
+</div>
+<footer>Caviar Knowledge Quiz</footer>
+<script>
+const ALL_CARDS = [
+  {cat:"Company", q:"Who founded the company and when?", a:"Two sisters founded it in San Francisco in 2015."},
+  {cat:"Company", q:"What are the company's three core values?", a:"Quality, Integrity, and Sustainability."},
+  {cat:"Company", q:"What does the Trident symbol represent for the brand?", a:"It symbolizes the power and bounty of the sea — associated with aquatic sustenance, power, strength, and honor."},
+  {cat:"Company", q:"What is the company's promise regarding product labeling?", a:"They will never mislabel or mislead their product, and will never trade integrity for profit."},
+  {cat:"Company", q:"What percentage of the sturgeon must partner farms utilize?", a:"At least 80% of the sturgeon."},
+  {cat:"Company", q:"What farming practices are required of partner farms?", a:"They must raise their own broodstock, never take from the wild if not legal, and have water recirculation and filtration practices in place."},
+  {cat:"Basics", q:"What is the difference between caviar and roe?", a:"Roe = all fish eggs. Caviar = cured roe specifically from the sturgeon species. All caviar is roe, but not all roe is caviar."},
+  {cat:"Basics", q:"What are the 5 criteria for grading caviar?", a:"1. Color (lighter = higher grade) 2. Size (larger = higher) 3. Texture (firmer) 4. Flavor (clean, distinguishable) 5. Consistency (uniformity)."},
+  {cat:"Basics", q:"How many sturgeon species exist?", a:"27 species: 25 true sturgeon + 2 Paddlefish species, which are closely related but not true sturgeon."},
+  {cat:"Basics", q:"How long have sturgeon existed on Earth?", a:"Over 250 million years — they are prehistoric fish."},
+  {cat:"Basics", q:"What does 'lighter color = higher grade' mean in practice?", a:"Golden or amber-colored eggs rank higher than dark brown or black ones."},
+  {cat:"Basics", q:"Is unpasteurized caviar better than pasteurized? Why?", a:"Generally yes — pasteurization compromises texture and flavor. Unpasteurized caviar lasts up to 4 weeks unopened and refrigerated."},
+  {cat:"Basics", q:"What is a 'caviar bump' and where does it originate?", a:"Eating caviar off the back of your hand. Dates to the 16th century — the warmth enhances flavor and aroma."},
+  {cat:"Basics", q:"What is the recommended serving size for caviar?", a:"1 oz for 1–2 people."},
+  {cat:"Basics", q:"How should you taste caviar properly?", a:"Gently press the roe against the roof of your mouth with your tongue. The eggs melt and release their flavors. Cleanse your palate between bites."},
+  {cat:"Myths", q:"MYTH or FACT: High-quality caviar should smell fishy.", a:"MYTH. High-quality caviar has no strong smell — subtle nutty, buttery notes with clean salinity."},
+  {cat:"Myths", q:"MYTH or FACT: Wild caviar is better than farmed.", a:"MYTH. Farmed caviar is more consistent — controlled water temperature, oxygen, feed, and breeding yield predictable quality, texture, and flavor."},
+  {cat:"Myths", q:"MYTH or FACT: All caviar comes from Russia.", a:"MYTH. Sturgeon are native to many regions including China, the US, Italy, Poland, and France. The US has not allowed Russian caviar imports since 2008."},
+  {cat:"Food Safety", q:"What is the optimal storage temperature for caviar?", a:"28°F to 32°F (-2°C to 0°C)."},
+  {cat:"Food Safety", q:"What happens if caviar isn't kept cold enough?", a:"It spoils — develops a fishy smell, eggs become soft, wet, or oily, losing their pop and shine."},
+  {cat:"Food Safety", q:"How often should refrigerator temperatures be logged?", a:"Twice daily — once in the morning and once before closing."},
+  {cat:"Food Safety", q:"What is the FIFO method?", a:"First In, First Out — oldest inventory is used before newer stock. New product goes behind existing product in the refrigerator."},
+  {cat:"Food Safety", q:"How long can caviar be left out of refrigeration?", a:"No more than 5 minutes. If longer is needed, use an ice bath."},
+  {cat:"Food Safety", q:"How do you set up an ice bath for caviar handling?", a:"Fill a bus bin with ice packs and place the jars or tins on top."},
+  {cat:"Food Safety", q:"Why should you avoid holding caviar tins in the palm of your hand?", a:"Body heat quickly raises the internal temperature, affecting texture and freshness."},
+  {cat:"Food Safety", q:"What is the shelf life of repacked caviar?", a:"Approximately 4–6 weeks from when it is repacked from its original tin."},
+  {cat:"Species", q:"What makes Imperial Golden Osetra rare?", a:"Only a 10% chance of its signature golden color — this trait cannot be forcibly produced. Same species as Russian Osetra (Acipenser Gueldenstaedtii), farmed in China."},
+  {cat:"Species", q:"Describe the flavor of Imperial Golden Osetra.", a:"Similar to Russian Osetra but with extra brine and a bright finish — a contrast to its richness."},
+  {cat:"Species", q:"What is the Kaluga Hybrid?", a:"A cross of Kaluga Sturgeon (Huso Dauricus) and Amur Sturgeon (Schrenke). Farmed in China in lakes that mimic the Caspian Sea."},
+  {cat:"Species", q:"Why is the female always Kaluga in Kaluga Hybrid cross-breeding?", a:"Kaluga produce larger eggs than Amur Sturgeon."},
+  {cat:"Species", q:"What does Kaluga Hybrid taste like?", a:"Notes of umami and earthiness. Large, robust bronze or chocolate brown eggs."},
+  {cat:"Species", q:"What makes Russian Osetra notable?", a:"Comes from true Acipenser Gueldenstaedtii — the most traditional and recognized caviar species. Females spawn at 15+ years old."},
+  {cat:"Species", q:"What nickname is given to Russian Osetra?", a:"The 'Kobe Beef of Caviar' — rich, meaty, and decadent flavor. Large, semi-firm amber egg."},
+  {cat:"Species", q:"What is the flavor profile of Siberian Sturgeon?", a:"Nutty, briny, clean finish — with notes similar to parmesan cheese. Farmed in Poland near a nature reserve."},
+  {cat:"Species", q:"What nickname is given to Classic White Sturgeon?", a:"The 'Sea Butter of Caviar' — buttery and creamy. Medium-sized soft pearl, onyx to dark brown in color."},
+  {cat:"Species", q:"What is unique about the Royal White Sturgeon purging process?", a:"Sturgeon are purged in very cold, clean water for weeks — slows metabolism, removes bad flavor, and improves egg quality."},
+  {cat:"Species", q:"What is Hackleback caviar?", a:"The smallest freshwater sturgeon (under 6 lbs, 32\"). Wild from Missouri and Tennessee rivers. The only commercially fished sturgeon in the US. Small, jet-black pearls."},
+  {cat:"Species", q:"Describe Paddlefish and its flavor.", a:"Closely related to but not technically a sturgeon. Wild from the Mississippi River. Small platinum pearls with a mossy, briny flavor similar to Sevruga."},
+  {cat:"Species", q:"What is Smoked Trout Roe and how is it prepared?", a:"Rainbow Trout roe cold-smoked with bourbon oak staves plus apple and cherry wood chips. Vibrant orange egg with a full pop and smoky finish."},
+  {cat:"Species", q:"What is Whitefish Roe and where does it come from?", a:"Wild from the Great Lakes (primarily Lake Huron). Small golden-yellow roe with mild, crisp flavor and unique crunch. Higher in omega-3s than Salmon Roe."},
+];
+const CATS = ['All', ...new Set(ALL_CARDS.map(c => c.cat))];
+let activecat='All', deck=[], idx=0, correct=0, wrong=0, revealed=false;
+function getDeck(){let d=activecat==='All'?[...ALL_CARDS]:ALL_CARDS.filter(c=>c.cat===activecat);for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}return d;}
+function renderFilters(){document.getElementById('filters').innerHTML=CATS.map(c=>`<button class="filter-btn${c===activecat?' active':''}" onclick="setcat('${c}')">${c}</button>`).join('');}
+function setcat(c){activecat=c;renderFilters();restart();}
+function showCard(){
+  if(idx>=deck.length){showDone();return;}
+  revealed=false;
+  const card=deck[idx];
+  document.getElementById('qtext').textContent=card.q;
+  document.getElementById('cat-badge').textContent=card.cat;
+  document.getElementById('hint').style.display='';
+  document.getElementById('ans').className='answer-box';
+  document.getElementById('grade-row').style.display='none';
+  document.getElementById('nav-row').style.display='none';
+  document.getElementById('scores').style.display='none';
+  document.getElementById('counter').textContent=`Card ${idx+1} of ${deck.length}`;
+  document.getElementById('prog').style.width=`${Math.round((idx/deck.length)*100)}%`;
+  updateScore();
+}
+function reveal(){if(revealed)return;revealed=true;document.getElementById('atext').textContent=deck[idx].a;document.getElementById('ans').className='answer-box show';document.getElementById('hint').style.display='none';document.getElementById('grade-row').style.display='flex';}
+function mark(c){if(c)correct++;else wrong++;document.getElementById('grade-row').style.display='none';document.getElementById('nav-row').style.display='flex';updateScore();}
+function skip(){document.getElementById('grade-row').style.display='none';idx++;showCard();}
+function nextCard(){idx++;showCard();}
+function updateScore(){document.getElementById('score-inline').innerHTML=`Correct: ${correct} &nbsp;|&nbsp; Missed: ${wrong}`;}
+function showDone(){
+  const total=correct+wrong;
+  const pct=total?Math.round((correct/total)*100):0;
+  document.getElementById('qtext').textContent='Deck complete!';
+  document.getElementById('cat-badge').textContent='Results';
+  document.getElementById('hint').style.display='none';
+  document.getElementById('ans').className='answer-box';
+  document.getElementById('grade-row').style.display='none';
+  document.getElementById('nav-row').style.display='flex';
+  document.getElementById('scores').style.display='grid';
+  document.getElementById('s-c').textContent=correct;
+  document.getElementById('s-w').textContent=wrong;
+  document.getElementById('s-p').textContent=pct+'%';
+  document.getElementById('prog').style.width='100%';
+}
+function restart(){deck=getDeck();idx=0;correct=0;wrong=0;showCard();}
+renderFilters();restart();
+</script>
+</body>
+</html>
