@@ -59,7 +59,7 @@
 <body>
 <header>
   <h1>Caviar Knowledge Quiz</h1>
-  <p>Test your expertise &mdash; 40 cards</p>
+  <p>Test your expertise &mdash; 45 cards</p>
 </header>
 <div class="container">
   <div class="filter-row" id="filters"></div>
@@ -134,6 +134,11 @@ const ALL_CARDS = [
   {cat:"Species", q:"Describe Paddlefish and its flavor.", a:"Closely related to but not technically a sturgeon. Wild from the Mississippi River. Small platinum pearls with a mossy, briny flavor similar to Sevruga."},
   {cat:"Species", q:"What is Smoked Trout Roe and how is it prepared?", a:"Rainbow Trout roe cold-smoked with bourbon oak staves plus apple and cherry wood chips. Vibrant orange egg with a full pop and smoky finish."},
   {cat:"Species", q:"What is Whitefish Roe and where does it come from?", a:"Wild from the Great Lakes (primarily Lake Huron). Small golden-yellow roe with mild, crisp flavor and unique crunch. Higher in omega-3s than Salmon Roe."},
+  {cat:"Kaluga Queen", q:"How did China become the world's largest caviar producer?", a:"When CITES banned wild Caspian sturgeon fishing in the early 2000s, it opened the door for farmed caviar. China moved quickly — Kaluga Queen launched in 2003, leveraged government scientific expertise, pioneered the Kaluga-Amur hybrid sturgeon (shorter maturation, larger eggs), and built at massive scale. They now produce over 30% of the world's caviar supply."},
+  {cat:"Kaluga Queen", q:"What is Kaluga Queen's presence in the Michelin fine dining world?", a:"Kaluga Queen supplies 21 out of 26 Michelin 3-star restaurants in Paris — a testament to the quality and consistency of their farmed caviar."},
+  {cat:"Kaluga Queen", q:"What was the breakthrough moment for Kaluga Queen internationally?", a:"In 2018, Lufthansa selected Kaluga Queen as their sole caviar supplier for first-class cabins — a major milestone that validated Chinese farmed caviar on the world stage."},
+  {cat:"Store Questions", q:"A customer asks which caviar they should buy. How do you approach it?", a:"Caviar is personal — there's no wrong answer. Top-line options like Kaluga Hybrid and Osetra offer rich, complex flavors. But Hackleback is a great entry point: it's more affordable, still true caviar, and a perfect way for first-timers to start exploring."},
+  {cat:"Store Questions", q:"A customer asks what to serve with caviar. What do you recommend?", a:"Classic pairings: blinis, crème fraîche, and lightly toasted brioche. Keep accompaniments simple so they don't overpower the caviar. Champagne or ice-cold vodka are the traditional beverage pairings. For the purist experience, suggest a caviar bump first — straight off the hand — before adding any accompaniments."},
 ];
 const CATS = ['All', ...new Set(ALL_CARDS.map(c => c.cat))];
 let activecat='All', deck=[], idx=0, correct=0, wrong=0, revealed=false;
